@@ -174,8 +174,9 @@ func (versionCfg versionConfig) BuildModulePathMap(root string) (ModulePathMap, 
 			modPathString := modfile.ModulePath(mod)
 
 			// convert modPath, filePath string to modulePath and moduleFilePath
-			modPath := ModulePath(modPathString)
-			modFilePath := ModuleFilePath(filePath)
+			// uses filepath.ToSlash() to ensure forward slashes on Windows
+			modPath := ModulePath(filepath.ToSlash(modPathString))
+			modFilePath := ModuleFilePath(filepath.ToSlash(filePath))
 
 			excludedModules := versionCfg.getExcludedModules()
 			if _, shouldExclude := excludedModules[modPath]; !shouldExclude {

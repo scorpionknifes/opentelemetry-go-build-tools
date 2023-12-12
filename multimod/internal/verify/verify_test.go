@@ -17,6 +17,7 @@ package verify
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -30,9 +31,7 @@ import (
 	"go.opentelemetry.io/build-tools/multimod/internal/common/commontest"
 )
 
-var (
-	testDataDir, _ = filepath.Abs("./test_data")
-)
+var testDataDir, _ = filepath.Abs("./test_data")
 
 // TestMain performs setup for the tests and suppress printing logs.
 func TestMain(m *testing.M) {
@@ -55,7 +54,7 @@ func TestNewVerification(t *testing.T) {
 	testName := "new_verification"
 	versionYamlDir := filepath.Join(testDataDir, testName)
 
-	tmpRootDir := t.TempDir()
+	tmpRootDir := filepath.ToSlash(t.TempDir())
 	modFiles := map[string][]byte{
 		filepath.Join(tmpRootDir, "test", "test1", "go.mod"): []byte("module \"go.opentelemetry.io/test/test1\"\n\ngo 1.16\n\n" +
 			"require (\n\t\"go.opentelemetry.io/testroot/v2\" v2.0.0\n)\n"),
@@ -101,9 +100,9 @@ func TestNewVerification(t *testing.T) {
 				},
 			},
 			expectedModulePathMap: common.ModulePathMap{
-				"go.opentelemetry.io/test/test1":  common.ModuleFilePath(filepath.Join(tmpRootDir, "test", "test1", "go.mod")),
-				"go.opentelemetry.io/test2":       common.ModuleFilePath(filepath.Join(tmpRootDir, "test", "go.mod")),
-				"go.opentelemetry.io/testroot/v2": common.ModuleFilePath(filepath.Join(tmpRootDir, "go.mod")),
+				"go.opentelemetry.io/test/test1":  common.ModuleFilePath(fmt.Sprintf("%s/test/test1/go.mod", tmpRootDir)),
+				"go.opentelemetry.io/test2":       common.ModuleFilePath(fmt.Sprintf("%s/test/go.mod", tmpRootDir)),
+				"go.opentelemetry.io/testroot/v2": common.ModuleFilePath(fmt.Sprintf("%s/go.mod", tmpRootDir)),
 			},
 			expectedModuleInfoMap: common.ModuleInfoMap{
 				"go.opentelemetry.io/test/test1": common.ModuleInfo{
@@ -227,7 +226,7 @@ func TestVerifyAllModulesInSet(t *testing.T) {
 	testName := "verify_all_modules_in_set"
 	versionYamlDir := filepath.Join(testDataDir, testName)
 
-	tmpRootDir := t.TempDir()
+	tmpRootDir := filepath.ToSlash(t.TempDir())
 	testCases := []struct {
 		name               string
 		versioningFilename string
@@ -259,7 +258,7 @@ func TestVerifyAllModulesInSet(t *testing.T) {
 			},
 			expectedError: &errModuleNotInSet{
 				modPath:     "go.opentelemetry.io/testroot/v2",
-				modFilePath: common.ModuleFilePath(filepath.Join(tmpRootDir, "not_listed", "go.mod")),
+				modFilePath: common.ModuleFilePath(fmt.Sprintf("%s/not_listed/go.mod", tmpRootDir)),
 			},
 		},
 		{

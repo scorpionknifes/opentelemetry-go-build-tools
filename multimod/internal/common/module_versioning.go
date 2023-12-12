@@ -33,6 +33,7 @@ func NewModuleVersioningWithIgnoreExcluded(versioningFilename string, repoRoot s
 	if err != nil {
 		return ModuleVersioning{}, fmt.Errorf("could not get absolute path of repo root: %w", err)
 	}
+	repoRoot = filepath.ToSlash(repoRoot) // Ensure forward slashes on Windows.
 
 	vCfg, err := readVersioningFile(versioningFilename)
 	vCfg.ignoreExcluded = ignoreExcluded

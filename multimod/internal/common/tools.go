@@ -79,7 +79,7 @@ func updateGoModVersions(modFilePath ModuleFilePath, newModPaths []ModulePath, n
 	}
 
 	// once all module versions have been updated, overwrite the go.mod file
-	if err := os.WriteFile(string(modFilePath), newGoModFile, 0600); err != nil {
+	if err := os.WriteFile(string(modFilePath), newGoModFile, 0o600); err != nil {
 		return fmt.Errorf("error overwriting go.mod file: %w", err)
 	}
 
@@ -118,7 +118,7 @@ func UpdateGoModFiles(modFilePaths []ModuleFilePath, newModPaths []ModulePath, n
 
 func filePathToRegex(fpath string) string {
 	quotedMeta := regexp.QuoteMeta(fpath)
-	replacedSlashes := strings.ReplaceAll(quotedMeta, string(filepath.Separator), `\/`)
+	replacedSlashes := strings.ReplaceAll(quotedMeta, "/", `\/`)
 	return replacedSlashes
 }
 

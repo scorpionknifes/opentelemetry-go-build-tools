@@ -36,6 +36,7 @@ func NewModuleSetRelease(versioningFilename, modSetToUpdate, repoRoot string) (M
 	if err != nil {
 		return ModuleSetRelease{}, fmt.Errorf("could not get absolute path of repo root: %w", err)
 	}
+	repoRoot = filepath.ToSlash(repoRoot) // Ensure forward slashes on Windows.
 
 	modVersioning, err := NewModuleVersioning(versioningFilename, repoRoot)
 	if err != nil {
@@ -64,7 +65,6 @@ func NewModuleSetRelease(versioningFilename, modSetToUpdate, repoRoot string) (M
 		ModSet:           modSet,
 		TagNames:         tagNames,
 	}, nil
-
 }
 
 // ModSetVersion gets the version of the module set to update.

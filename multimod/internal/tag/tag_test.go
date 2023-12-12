@@ -15,6 +15,7 @@
 package tag
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -30,9 +31,7 @@ import (
 	"go.opentelemetry.io/build-tools/multimod/internal/common/commontest"
 )
 
-var (
-	testDataDir, _ = filepath.Abs("./test_data")
-)
+var testDataDir, _ = filepath.Abs("./test_data")
 
 // TestMain performs setup for the tests and suppress printing logs.
 func TestMain(m *testing.M) {
@@ -44,7 +43,7 @@ func TestNewTagger(t *testing.T) {
 	testName := "new_tagger"
 	versionsYamlDir := filepath.Join(testDataDir, testName)
 
-	tmpRootDir := t.TempDir()
+	tmpRootDir := filepath.ToSlash(t.TempDir())
 	repo, _, err := commontest.InitNewRepoWithCommit(tmpRootDir)
 	require.NoError(t, err)
 
@@ -85,9 +84,9 @@ func TestNewTagger(t *testing.T) {
 		},
 	}
 	expectedModulePathMap := common.ModulePathMap{
-		"go.opentelemetry.io/test/test1":  common.ModuleFilePath(filepath.Join(tmpRootDir, "test", "test1", "go.mod")),
-		"go.opentelemetry.io/test2":       common.ModuleFilePath(filepath.Join(tmpRootDir, "test", "go.mod")),
-		"go.opentelemetry.io/testroot/v2": common.ModuleFilePath(filepath.Join(tmpRootDir, "go.mod")),
+		"go.opentelemetry.io/test/test1":  common.ModuleFilePath(fmt.Sprintf("%s/test/test1/go.mod", tmpRootDir)),
+		"go.opentelemetry.io/test2":       common.ModuleFilePath(fmt.Sprintf("%s/test/go.mod", tmpRootDir)),
+		"go.opentelemetry.io/testroot/v2": common.ModuleFilePath(fmt.Sprintf("%s/go.mod", tmpRootDir)),
 	}
 	expectedModuleInfoMap := common.ModuleInfoMap{
 		"go.opentelemetry.io/test/test1": common.ModuleInfo{
@@ -253,7 +252,6 @@ func TestVerifyTagsOnCommit(t *testing.T) {
 			actual := verifyTagsOnCommit(tc.moduleFullTags, repo, tc.commitHash)
 			assert.Equal(t, tc.expectedError, actual)
 		})
-
 	}
 }
 
@@ -298,7 +296,6 @@ func TestGetFullCommitHash(t *testing.T) {
 
 			if tc.expectedError != nil {
 				assert.IsType(t, tc.expectedError, err)
-
 			} else {
 				require.NoError(t, err)
 			}
@@ -460,7 +457,6 @@ func TestDeleteTags(t *testing.T) {
 				}
 			}
 		})
-
 	}
 }
 
@@ -593,5 +589,4 @@ func TestTagAllModules(t *testing.T) {
 			}
 		})
 	}
-
 }

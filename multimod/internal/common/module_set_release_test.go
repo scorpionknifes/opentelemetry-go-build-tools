@@ -15,6 +15,7 @@
 package common
 
 import (
+	"fmt"
 	"path/filepath"
 	"testing"
 	"time"
@@ -28,7 +29,7 @@ import (
 )
 
 func TestNewModuleSetRelease(t *testing.T) {
-	tmpRootDir := t.TempDir()
+	tmpRootDir := filepath.ToSlash(t.TempDir())
 	modFiles := map[string][]byte{
 		filepath.Join(tmpRootDir, "test", "test1", "go.mod"): []byte("module \"go.opentelemetry.io/test/test1\"\n\ngo 1.16\n\n" +
 			"require (\n\t\"go.opentelemetry.io/testroot/v2\" v2.0.0\n)\n"),
@@ -84,9 +85,9 @@ func TestNewModuleSetRelease(t *testing.T) {
 				},
 			},
 			expectedModulePathMap: ModulePathMap{
-				"go.opentelemetry.io/test/test1":  ModuleFilePath(filepath.Join(tmpRootDir, "test", "test1", "go.mod")),
-				"go.opentelemetry.io/test3":       ModuleFilePath(filepath.Join(tmpRootDir, "test", "go.mod")),
-				"go.opentelemetry.io/testroot/v2": ModuleFilePath(filepath.Join(tmpRootDir, "go.mod")),
+				"go.opentelemetry.io/test/test1":  ModuleFilePath(fmt.Sprintf("%s/test/test1/go.mod", tmpRootDir)),
+				"go.opentelemetry.io/test3":       ModuleFilePath(fmt.Sprintf("%s/test/go.mod", tmpRootDir)),
+				"go.opentelemetry.io/testroot/v2": ModuleFilePath(fmt.Sprintf("%s/go.mod", tmpRootDir)),
 			},
 			expectedModuleInfoMap: ModuleInfoMap{
 				"go.opentelemetry.io/test/test1": ModuleInfo{
@@ -166,7 +167,7 @@ func TestNewModuleSetRelease(t *testing.T) {
 }
 
 func TestCheckGitTagsAlreadyExist(t *testing.T) {
-	tmpRootDir := t.TempDir()
+	tmpRootDir := filepath.ToSlash(t.TempDir())
 	modFiles := map[string][]byte{
 		filepath.Join(tmpRootDir, "test", "test1", "go.mod"): []byte("module \"go.opentelemetry.io/test/test1\"\n\ngo 1.16\n\n" +
 			"require (\n\t\"go.opentelemetry.io/testroot/v2\" v2.0.0\n)\n"),

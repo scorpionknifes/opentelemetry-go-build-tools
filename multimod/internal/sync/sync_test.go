@@ -16,6 +16,7 @@ package sync
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -30,9 +31,7 @@ import (
 	"go.opentelemetry.io/build-tools/multimod/internal/common/commontest"
 )
 
-var (
-	testDataDir, _ = filepath.Abs("./test_data")
-)
+var testDataDir, _ = filepath.Abs("./test_data")
 
 // TestMain performs setup for the tests and suppress printing logs.
 func TestMain(m *testing.M) {
@@ -51,6 +50,7 @@ func TestNewSync(t *testing.T) {
 	if err != nil {
 		t.Fatal("creating temp dir:", err)
 	}
+	tmpRootDir = filepath.ToSlash(tmpRootDir)
 
 	defer os.RemoveAll(tmpRootDir)
 
@@ -110,10 +110,10 @@ func TestNewSync(t *testing.T) {
 			},
 		},
 		ModPathMap: common.ModulePathMap{
-			"go.opentelemetry.io/build-tools/multimod/internal/sync/test/test1":  common.ModuleFilePath(filepath.Join(tmpRootDir, "my", "test", "test1", "go.mod")),
-			"go.opentelemetry.io/build-tools/multimod/internal/sync/test/test2":  common.ModuleFilePath(filepath.Join(tmpRootDir, "my", "test", "test2", "go.mod")),
-			"go.opentelemetry.io/build-tools/multimod/internal/sync/test3":       common.ModuleFilePath(filepath.Join(tmpRootDir, "my", "test", "go.mod")),
-			"go.opentelemetry.io/build-tools/multimod/internal/sync/testroot/v2": common.ModuleFilePath(filepath.Join(tmpRootDir, "my", "go.mod")),
+			"go.opentelemetry.io/build-tools/multimod/internal/sync/test/test1":  common.ModuleFilePath(fmt.Sprintf("%s/my/test/test1/go.mod", tmpRootDir)),
+			"go.opentelemetry.io/build-tools/multimod/internal/sync/test/test2":  common.ModuleFilePath(fmt.Sprintf("%s/my/test/test2/go.mod", tmpRootDir)),
+			"go.opentelemetry.io/build-tools/multimod/internal/sync/test3":       common.ModuleFilePath(fmt.Sprintf("%s/my/test/go.mod", tmpRootDir)),
+			"go.opentelemetry.io/build-tools/multimod/internal/sync/testroot/v2": common.ModuleFilePath(fmt.Sprintf("%s/my/go.mod", tmpRootDir)),
 		},
 		ModInfoMap: common.ModuleInfoMap{
 			"go.opentelemetry.io/build-tools/multimod/internal/sync/test/test1": common.ModuleInfo{
@@ -187,7 +187,6 @@ func (f roundTripFunc) RoundTrip(req *http.Request) (*http.Response, error) {
 }
 
 func TestUpdateAllGoModFilesWithCommitHash(t *testing.T) {
-
 	testName := "update_all_go_mod_files_with_commit_hash"
 	versionsYamlDir := filepath.Join(testDataDir, testName)
 
@@ -327,7 +326,6 @@ func TestUpdateAllGoModFilesWithCommitHash(t *testing.T) {
 			}
 		})
 	}
-
 }
 
 func TestUpdateAllGoModFiles(t *testing.T) {
